@@ -7,7 +7,7 @@ namespace Database.Repositories
 {
     public class ProductRepository : IProductsRepository
     {
-        private readonly Dictionary<int, Proizvod> _products;
+        public readonly Dictionary<int, Proizvod> _products;
         private int _id = 0;
 
         public ProductRepository()
@@ -40,6 +40,39 @@ namespace Database.Repositories
         {
             return _products.Values.ToList();
         }
+        public bool Delete(int productId)
+        {
+            if(!_products.Remove(productId))
+            {
+                SaveRepository();
+                return true;
+            }
+            
+            return false;
+        }
+        public Proizvod? GetById(int productId)
+        {
+            if(_products.ContainsKey(productId))
+            {
+                return _products[productId];
+            }
+            return null;
+        }
 
+        public List<Proizvod> SearchByKeyword(string keyword)
+        {
+            return _products.Values.Where(p => p.Ime.Contains(keyword, StringComparison.OrdinalIgnoreCase)
+            || p.Opis.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        public bool Update(int productId, Proizvod product)
+        {
+            if(!_products.ContainsKey(productId))
+            {
+                return false;
+            }
+            _products[productId] = product;
+            SaveRepository();
+            return true;
+        }
     }
 }
